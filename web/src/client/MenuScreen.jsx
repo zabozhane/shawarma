@@ -15,7 +15,9 @@ export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total,
 
   if (!menu) return <div className="loading" aria-busy="true" />;
 
-  const cats = new Map(menu.categories.map((c) => [c.id, c]));
+  const inCategory = new Map();
+  for (const it of menu.items) if (cart[it.id]) inCategory.set(it.categoryId, (inCategory.get(it.categoryId) || 0) + cart[it.id]);
+  const full = menu.categories.filter((c) => (inCategory.get(c.id) || 0) >= max);
   const change = (item, d) => setCart((c) => {
     const next = { ...c, [item.id]: Math.max(0, (c[item.id] || 0) + d) };
     if (!next[item.id]) delete next[item.id];
@@ -54,8 +56,7 @@ export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total,
             <h2 className="display">{c.names[lang] || c.names.ru}</h2>
             {items.map((it) => {
               const qty = cart[it.id] || 0;
-              const counted = cats.get(it.categoryId)?.countsInLimit;
-              const blocked = !it.available || (counted && units >= max);
+              const blocked = !it.available || (inCategory.get(c.id) || 0) >= max;
               const desc = it.descriptions?.[lang] || it.descriptions?.ru;
               return (
                 <article key={it.id} className={`item card${it.available ? '' : ' off'}`}>
@@ -63,7 +64,7 @@ export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total,
                   <div className="item-text">
                     <h3>{name(it)}</h3>
                     <p className="muted">
-                      {!it.available ? t('soldOut') : [desc, !counted && t('noLimit')].filter(Boolean).join(' · ')}
+                      {!it.available ? t('soldOut') : desc}
                     </p>
                     <b className="price">{money(it.price)}</b>
                   </div>
@@ -84,15 +85,8 @@ export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total,
       })}
 
       <div className="cart-bar">
-        <div className="meter">
-          <span>{t('inOrder')}</span>
-          <b>{t('of', { n: units, m: max })}</b>
-        </div>
-        <div className="pips" aria-hidden="true">
-          {Array.from({ length: max }, (_, i) => <i key={i} className={i < units ? 'on' : ''} />)}
-        </div>
-        {units >= max
-          ? <p className="note">{t('limitMax')}</p>
+        {full.length
+          ? full.map((c) => <p key={c.id} className="note">{t('limitMax', { c: c.names[lang] || c.names.ru, n: max })}</p>)
           : <p className="hint muted">{t('limitHint', { n: max })}</p>}
         <button type="button" className="btn dark wide" disabled={total === 0} onClick={() => go('/checkout')}>
           <span>{t('checkout')}</span><span>{money(total)}</span>

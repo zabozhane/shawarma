@@ -5,12 +5,19 @@ import { DEFAULT_SETTINGS as settings } from '../server/config.js';
 import { isDisposableEmail } from '../server/disposable.js';
 
 const now = Date.parse('2026-10-28T10:00:00Z');
-const shawarma = (qty) => ({ qty, counted: true, available: true });
-const drink = (qty) => ({ qty, counted: false, available: true });
+const shawarma = (qty) => ({ qty, categoryId: 1, counted: true, available: true });
+const fries = (qty) => ({ qty, categoryId: 2, counted: true, available: true });
+const drink = (qty) => ({ qty, categoryId: 3, counted: false, available: true });
 
-test('напитки не входят в лимит', () => {
-  assert.equal(countUnits([shawarma(2), drink(5)]), 2);
-  assert.equal(orderBlocker({ settings, lines: [shawarma(2), drink(5)], customer: {}, hasActiveOrder: false, now }), null);
+test('кухня считает шаурму и закуски, но не напитки', () => {
+  assert.equal(countUnits([shawarma(2), fries(1), drink(2)]), 3);
+});
+
+test('по 2 штуки из каждого раздела', () => {
+  assert.equal(orderBlocker({ settings, lines: [shawarma(2), fries(2), drink(2)], customer: {}, hasActiveOrder: false, now }), null);
+  assert.equal(orderBlocker({ settings, lines: [shawarma(1), fries(1)], customer: {}, hasActiveOrder: false, now }), null);
+  assert.equal(orderBlocker({ settings, lines: [drink(3)], customer: {}, hasActiveOrder: false, now }), 'limit');
+  assert.equal(orderBlocker({ settings, lines: [shawarma(1), { ...shawarma(2), id: 2 }], customer: {}, hasActiveOrder: false, now }), 'limit');
 });
 
 test('больше 2 шаурм нельзя', () => {
