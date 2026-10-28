@@ -19,7 +19,7 @@ h1.display { font-size: 30px; line-height: 1.05; }
 .loading { height: 40vh; }
 
 /* Меню */
-.menu { display: grid; gap: 14px; padding-bottom: 190px; }
+.menu { display: grid; gap: 14px; padding-bottom: 260px; }
 .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
 .chips a { flex: none; text-decoration: none; color: var(--ink); font-weight: 600; font-size: 14px; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--stroke); background: var(--surface); }
 .cat { display: grid; gap: 10px; scroll-margin-top: 80px; }
@@ -33,6 +33,8 @@ h1.display { font-size: 30px; line-height: 1.05; }
 .qty { display: flex; align-items: center; gap: 8px; }
 .qty button { width: 38px; height: 38px; border-radius: 12px; border: 2px solid var(--dark); background: var(--yellow); color: #1A1410; font-size: 22px; font-weight: 700; line-height: 1; }
 .qty button.minus { background: var(--surface); color: var(--ink); border-color: var(--stroke); }
+/* Недоступная кнопка не должна выглядеть рабочей ни в светлой, ни в тёмной теме */
+.qty button:disabled { opacity: 1; background: var(--soft); color: var(--muted); border-color: var(--soft); }
 .qty span { min-width: 14px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
 
 .cart-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9; max-width: 560px; margin: 0 auto; display: grid; gap: 8px;
