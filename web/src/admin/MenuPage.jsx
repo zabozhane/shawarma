@@ -97,9 +97,9 @@ export function MenuPage({ isOwner }) {
                 <label className="check">
                   <input type="checkbox" id={`limit-${c.id}`} checked={c.countsInLimit}
                     onChange={(e) => run(() => api(`/admin/menu/categories/${c.id}`, { method: 'PUT', body: { names: c.names, countsInLimit: e.target.checked } }))} />
-                  <span>Считать в лимите заказа</span>
+                  <span>Готовит кухня (занимает место в окне)</span>
                 </label>
-              ) : <span className="muted">{c.countsInLimit ? 'В лимите' : 'Без лимита'}</span>}
+              ) : <span className="muted">{c.countsInLimit ? 'Готовит кухня' : 'Не нагружает кухню'}</span>}
             </div>
             <div className="table-wrap">
               <table>

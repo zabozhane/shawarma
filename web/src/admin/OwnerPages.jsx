@@ -52,7 +52,7 @@ export function CustomersPage() {
 
 const FIELDS = [
   ['Заказ', [
-    ['maxPerOrder', 'Шаурм в одном заказе', 'number'],
+    ['maxPerOrder', 'Максимум штук из каждого раздела меню', 'number'],
     ['manualConfirm', 'Подтверждать заказы вручную', 'select', [['flagged', 'Только после «Не забрали»'], ['all', 'Все заказы'], ['none', 'Никогда']]],
   ]],
   ['Кухня', [

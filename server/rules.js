@@ -2,9 +2,16 @@
 
 const DAY = 86_400_000;
 
-// Сколько позиций заказа считается в лимите (шаурма и закуски, но не напитки и соусы)
+// Сколько позиций заказа готовит кухня (шаурма и закуски, но не напитки и соусы)
 export function countUnits(lines) {
   return lines.reduce((sum, l) => sum + (l.counted ? l.qty : 0), 0);
+}
+
+// Сколько штук заказано из каждого раздела меню
+export function countByCategory(lines) {
+  const counts = new Map();
+  for (const l of lines) counts.set(l.categoryId, (counts.get(l.categoryId) || 0) + l.qty);
+  return counts;
 }
 
 // Можно ли оформить заказ. Возвращает код ошибки или null.
@@ -12,7 +19,7 @@ export function orderBlocker({ settings, lines, customer, hasActiveOrder, now })
   if (!settings.accepting) return 'paused';
   if (!lines.length || lines.every((l) => l.qty <= 0)) return 'empty';
   if (lines.some((l) => !l.available)) return 'unavailable';
-  if (countUnits(lines) > settings.maxPerOrder) return 'limit';
+  if ([...countByCategory(lines).values()].some((n) => n > settings.maxPerOrder)) return 'limit';
   if (customer?.banned_until && new Date(customer.banned_until).getTime() > now) return 'banned';
   if (hasActiveOrder) return 'active_order';
   return null;

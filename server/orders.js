@@ -26,7 +26,8 @@ async function kitchenContext(db, now) {
 export async function availability(units) {
   const now = Date.now();
   const ctx = await kitchenContext({ query }, now);
-  const n = Math.max(1, Math.min(units || 1, ctx.settings.maxPerOrder));
+  // Лимит по разделам меню, поэтому кухне может достаться больше maxPerOrder штук
+  const n = Math.max(1, Math.min(units || 1, 20));
   const { asap: best, options } = timeOptions(n, ctx);
   return {
     accepting: ctx.settings.accepting,
@@ -85,10 +86,10 @@ export async function createOrder({ customer, deviceId, lines: rawLines, readyAt
       if (Number.isInteger(id) && Number.isInteger(qty) && qty > 0 && qty <= 20) wanted.set(id, (wanted.get(id) || 0) + qty);
     }
     const { rows: items } = await db.query(
-      `SELECT m.id, m.names, m.price, m.available AND NOT m.archived AS available, c.counts_in_limit
+      `SELECT m.id, m.category_id, m.names, m.price, m.available AND NOT m.archived AS available, c.counts_in_limit
          FROM menu_items m JOIN categories c ON c.id = m.category_id WHERE m.id = ANY($1)`, [[...wanted.keys()]]);
     if (items.length !== wanted.size) return { error: 'unavailable' };
-    const lines = items.map((it) => ({ ...it, qty: wanted.get(it.id), counted: it.counts_in_limit }));
+    const lines = items.map((it) => ({ ...it, qty: wanted.get(it.id), categoryId: it.category_id, counted: it.counts_in_limit }));
 
     const { rows: active } = await db.query(
       'SELECT 1 FROM orders WHERE customer_id = $1 AND status = ANY($2) LIMIT 1', [customer.id, ACTIVE]);
