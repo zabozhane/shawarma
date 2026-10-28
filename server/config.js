@@ -28,7 +28,6 @@ export const config = {
 export const LANGS = ['ru', 'en', 'zh', 'ko', 'az', 'uz', 'tg', 'tr', 'kk'];
 
 export const DEFAULT_SETTINGS = {
-  maxPerOrder: 2,
   slotMinutes: 10,
   capacityPerSlot: 2,
   onlinePerSlotPeak: 1,

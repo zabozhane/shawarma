@@ -46,12 +46,12 @@ function stream(req, res, filter) {
 api.use(customerMiddleware);
 
 api.get('/menu', async (_req, res) => {
-  const { rows: categories } = await query('SELECT id, names, counts_in_limit AS "countsInLimit" FROM categories ORDER BY sort, id');
+  const { rows: categories } = await query('SELECT id, names, counts_in_limit AS "usesKitchen", max_qty AS "maxQty" FROM categories ORDER BY sort, id');
   const { rows: items } = await query(
     `SELECT id, category_id AS "categoryId", names, descriptions, price, available
        FROM menu_items WHERE NOT archived ORDER BY sort, id`);
   const settings = await getSettings();
-  res.json({ categories, items, maxPerOrder: settings.maxPerOrder, openFrom: settings.openFrom, openTo: settings.openTo, timezone: config.timezone });
+  res.json({ categories, items, openFrom: settings.openFrom, openTo: settings.openTo, timezone: config.timezone });
 });
 
 api.get('/availability', async (req, res) => {
@@ -253,7 +253,7 @@ admin.get('/stats', async (_req, res) => {
 
 // Меню
 admin.get('/menu', async (_req, res) => {
-  const { rows: categories } = await query('SELECT id, names, counts_in_limit AS "countsInLimit", sort FROM categories ORDER BY sort, id');
+  const { rows: categories } = await query('SELECT id, names, counts_in_limit AS "usesKitchen", max_qty AS "maxQty", sort FROM categories ORDER BY sort, id');
   const { rows: items } = await query(
     'SELECT id, category_id AS "categoryId", names, descriptions, price, available, sort FROM menu_items WHERE NOT archived ORDER BY sort, id');
   res.json({ categories, items, langs: LANGS });
@@ -307,8 +307,10 @@ admin.patch('/menu/items/:id/available', async (req, res) => {
 admin.put('/menu/categories/:id', ownerOnly, async (req, res) => {
   const names = cleanTexts(req.body?.names, true);
   if (!names) return fail(res, 'name_required');
-  await query('UPDATE categories SET names = $2, counts_in_limit = $3 WHERE id = $1',
-    [id(req.params.id), names, req.body?.countsInLimit === true]);
+  const maxQty = req.body?.maxQty ?? null;
+  if (maxQty !== null && !(Number.isInteger(maxQty) && maxQty >= 1 && maxQty <= 20)) return fail(res, 'bad_limit');
+  await query('UPDATE categories SET names = $2, counts_in_limit = $3, max_qty = $4 WHERE id = $1',
+    [id(req.params.id), names, req.body?.usesKitchen === true, maxQty]);
   res.json({ ok: true });
 });
 

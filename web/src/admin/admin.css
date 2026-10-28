@@ -82,3 +82,8 @@ td.warn { color: var(--red); font-weight: 700; }
   .done-row { grid-template-columns: 40px 1fr auto; }
   .done-row .muted { display: none; }
 }
+
+/* Настройки раздела меню: лимит и кухня */
+.cat-opts { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.cat-opts .check { align-items: center; gap: 6px; }
+.cat-opts .qty-limit { width: 56px; padding: 4px 8px; border: 2px solid var(--stroke); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; }

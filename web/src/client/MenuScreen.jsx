@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../shared/api.js';
 import { money, clock } from '../shared/format.js';
 
-export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total, name }) {
+export function MenuScreen({ t, lang, go, me, menu, cart, setCart, lines, units, total, name }) {
   const [avail, setAvail] = useState(null);
-  const max = menu?.maxPerOrder ?? 2;
 
   useEffect(() => {
     const load = () => api(`/availability?units=${Math.max(1, units)}`).then(setAvail).catch(() => {});
@@ -15,7 +14,9 @@ export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total,
 
   if (!menu) return <div className="loading" aria-busy="true" />;
 
-  const cats = new Map(menu.categories.map((c) => [c.id, c]));
+  // Сколько штук уже взято из каждого раздела
+  const taken = new Map();
+  for (const l of lines) taken.set(l.item.categoryId, (taken.get(l.item.categoryId) || 0) + l.qty);
   const change = (item, d) => setCart((c) => {
     const next = { ...c, [item.id]: Math.max(0, (c[item.id] || 0) + d) };
     if (!next[item.id]) delete next[item.id];
@@ -49,13 +50,17 @@ export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total,
       {menu.categories.map((c) => {
         const items = menu.items.filter((it) => it.categoryId === c.id);
         if (!items.length) return null;
+        const full = c.maxQty != null && (taken.get(c.id) || 0) >= c.maxQty;
         return (
           <section key={c.id} id={`cat-${c.id}`} className="cat">
-            <h2 className="display">{c.names[lang] || c.names.ru}</h2>
+            <div className="cat-head">
+              <h2 className="display">{c.names[lang] || c.names.ru}</h2>
+              <small className="muted">{c.maxQty != null ? t('upTo', { n: c.maxQty }) : t('noLimit')}</small>
+            </div>
+            {full && <p className="note">{t('limitMax')}</p>}
             {items.map((it) => {
               const qty = cart[it.id] || 0;
-              const counted = cats.get(it.categoryId)?.countsInLimit;
-              const blocked = !it.available || (counted && units >= max);
+              const blocked = !it.available || full;
               const desc = it.descriptions?.[lang] || it.descriptions?.ru;
               return (
                 <article key={it.id} className={`item card${it.available ? '' : ' off'}`}>
@@ -63,7 +68,7 @@ export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total,
                   <div className="item-text">
                     <h3>{name(it)}</h3>
                     <p className="muted">
-                      {!it.available ? t('soldOut') : [desc, !counted && t('noLimit')].filter(Boolean).join(' · ')}
+                      {!it.available ? t('soldOut') : desc}
                     </p>
                     <b className="price">{money(it.price)}</b>
                   </div>
@@ -84,16 +89,7 @@ export function MenuScreen({ t, lang, go, me, menu, cart, setCart, units, total,
       })}
 
       <div className="cart-bar">
-        <div className="meter">
-          <span>{t('inOrder')}</span>
-          <b>{t('of', { n: units, m: max })}</b>
-        </div>
-        <div className="pips" aria-hidden="true">
-          {Array.from({ length: max }, (_, i) => <i key={i} className={i < units ? 'on' : ''} />)}
-        </div>
-        {units >= max
-          ? <p className="note">{t('limitMax')}</p>
-          : <p className="hint muted">{t('limitHint', { n: max })}</p>}
+        <p className="hint muted">{t('limitHint')}</p>
         <button type="button" className="btn dark wide" disabled={total === 0} onClick={() => go('/checkout')}>
           <span>{t('checkout')}</span><span>{money(total)}</span>
         </button>

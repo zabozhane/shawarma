@@ -26,6 +26,7 @@ export const ERRORS = {
   bad_status: 'Заказ уже в другом статусе, обновите страницу',
   name_required: 'Укажите название по-русски',
   bad_price: 'Проверьте цену',
+  bad_limit: 'Лимит раздела: от 1 до 20 или пусто',
 };
 export const errText = (e) => ERRORS[e?.code] || (e?.code?.startsWith('invalid:') ? 'Проверьте значение поля' : 'Не получилось, попробуйте ещё раз');
 

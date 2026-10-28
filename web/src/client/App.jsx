@@ -38,7 +38,7 @@ export function App() {
   const refreshMe = useCallback(() => api('/me').then(setMe).catch(() => {}), []);
   useEffect(() => {
     refreshMe();
-    api('/menu').then((m) => { setTimezone(m.timezone); setMenu(m); }).catch(() => setMenu({ categories: [], items: [], maxPerOrder: 2, error: true }));
+    api('/menu').then((m) => { setTimezone(m.timezone); setMenu(m); }).catch(() => setMenu({ categories: [], items: [], error: true }));
   }, [refreshMe]);
 
   // Пока есть вход, слушаем изменения своих заказов
@@ -60,13 +60,13 @@ export function App() {
     if (me.customer) api('/me', { method: 'PATCH', body: { lang: l } }).catch(() => {});
   };
 
-  // Корзина: что в ней лежит и сколько позиций идёт в лимит
+  // Корзина: что в ней лежит и сколько шаурм займут кухню
   const lines = useMemo(() => {
     if (!menu) return [];
     const cats = new Map(menu.categories.map((c) => [c.id, c]));
     return menu.items
       .filter((it) => cart[it.id] > 0)
-      .map((it) => ({ item: it, qty: cart[it.id], counted: cats.get(it.categoryId)?.countsInLimit ?? true }));
+      .map((it) => ({ item: it, qty: cart[it.id], counted: cats.get(it.categoryId)?.usesKitchen ?? true }));
   }, [menu, cart]);
   const units = lines.reduce((s, l) => s + (l.counted ? l.qty : 0), 0);
   const total = lines.reduce((s, l) => s + l.qty * l.item.price, 0);

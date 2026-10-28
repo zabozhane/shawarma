@@ -40,7 +40,7 @@ export async function seed() {
   await tx(async (db) => {
     const ids = [];
     for (const [i, c] of CATEGORIES.entries()) {
-      const { rows } = await db.query('INSERT INTO categories (names, counts_in_limit, sort) VALUES ($1, $2, $3) RETURNING id', [c.names, c.counts, i]);
+      const { rows } = await db.query('INSERT INTO categories (names, counts_in_limit, max_qty, sort) VALUES ($1, $2, 2, $3) RETURNING id', [c.names, c.counts, i]);
       ids.push(rows[0].id);
     }
     for (const [i, [cat, price, names, descriptions]] of ITEMS.entries()) {

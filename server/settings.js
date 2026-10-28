@@ -16,7 +16,6 @@ const int = (min, max) => (v) => Number.isInteger(v) && v >= min && v <= max;
 
 // Что владелец может менять и в каких пределах
 const RULES = {
-  maxPerOrder: int(1, 20),
   slotMinutes: (v) => [5, 10, 15, 20, 30].includes(v),
   capacityPerSlot: int(1, 50),
   onlinePerSlotPeak: int(0, 50),

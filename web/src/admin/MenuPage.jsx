@@ -62,6 +62,9 @@ export function MenuPage({ isOwner }) {
     setError('');
     try { await fn(); await load(); } catch (e) { setError(errText(e)); }
   };
+  const saveCat = (c, patch) => run(() => api(`/admin/menu/categories/${c.id}`, {
+    method: 'PUT', body: { names: c.names, usesKitchen: c.usesKitchen, maxQty: c.maxQty, ...patch },
+  }));
   const save = async (form) => {
     if (editing.id) await api(`/admin/menu/items/${editing.id}`, { method: 'PUT', body: form });
     else await api('/admin/menu/items', { method: 'POST', body: form });
@@ -94,12 +97,22 @@ export function MenuPage({ isOwner }) {
             <div className="page-head">
               <h2>{c.names.ru}</h2>
               {isOwner ? (
-                <label className="check">
-                  <input type="checkbox" id={`limit-${c.id}`} checked={c.countsInLimit}
-                    onChange={(e) => run(() => api(`/admin/menu/categories/${c.id}`, { method: 'PUT', body: { names: c.names, countsInLimit: e.target.checked } }))} />
-                  <span>Считать в лимите заказа</span>
-                </label>
-              ) : <span className="muted">{c.countsInLimit ? 'В лимите' : 'Без лимита'}</span>}
+                <span className="cat-opts">
+                  <label className="check">
+                    <span>В заказе до</span>
+                    <input type="number" min="1" max="20" className="qty-limit" placeholder="∞" defaultValue={c.maxQty ?? ''}
+                      onBlur={(e) => {
+                        const v = e.target.value === '' ? null : Number(e.target.value);
+                        if (v !== c.maxQty) saveCat(c, { maxQty: v });
+                      }} />
+                    <span>шт.</span>
+                  </label>
+                  <label className="check" title="Если включено, позиции раздела занимают места в окнах кухни и сдвигают время готовности">
+                    <input type="checkbox" checked={c.usesKitchen} onChange={(e) => saveCat(c, { usesKitchen: e.target.checked })} />
+                    <span>Занимает кухню</span>
+                  </label>
+                </span>
+              ) : <span className="muted">{c.maxQty ? `В заказе до ${c.maxQty} шт.` : 'Без лимита'}</span>}
             </div>
             <div className="table-wrap">
               <table>

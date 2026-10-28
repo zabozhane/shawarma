@@ -49,7 +49,7 @@ function OrderCard({ o, act, isOwner }) {
           <button type="button" className="btn small ghost" onClick={() => act(o, 'reject')}>Отклонить</button>
         </>}
         {o.status === 'accepted' && <>
-          <button type="button" className="btn small" onClick={() => act(o, 'cook')}>Готовлю</button>
+          <button type="button" className="btn small" onClick={() => act(o, 'cook')}>Начать готовить</button>
           <button type="button" className="btn small ghost" onClick={() => act(o, 'ready')}>Готово</button>
         </>}
         {o.status === 'cooking' && <button type="button" className="btn small" onClick={() => act(o, 'ready')}>Готово</button>}
@@ -138,12 +138,12 @@ export function OrdersPage({ isOwner, vapidPublicKey, onNewCount }) {
       {error && <p className="note" role="alert">{error}</p>}
 
       <div className="cols">
-        <section className="col"><h2>Новые <span>{by(['new']).length}</span></h2>
-          {by(['new']).map((o) => <OrderCard key={o.id} o={o} act={act} isOwner={isOwner} />)}
-          {by(['new']).length === 0 && <p className="empty">Новые заказы появятся здесь со звуком</p>}
+        <section className="col"><h2>Новые <span>{by(['new', 'accepted']).length}</span></h2>
+          {by(['new', 'accepted']).map((o) => <OrderCard key={o.id} o={o} act={act} isOwner={isOwner} />)}
+          {by(['new', 'accepted']).length === 0 && <p className="empty">Новые заказы появятся здесь со звуком</p>}
         </section>
-        <section className="col"><h2>Готовятся <span>{by(['accepted', 'cooking']).length}</span></h2>
-          {by(['accepted', 'cooking']).map((o) => <OrderCard key={o.id} o={o} act={act} isOwner={isOwner} />)}
+        <section className="col"><h2>Готовятся <span>{by(['cooking']).length}</span></h2>
+          {by(['cooking']).map((o) => <OrderCard key={o.id} o={o} act={act} isOwner={isOwner} />)}
         </section>
         <section className="col"><h2>Ждут выдачи <span>{by(['ready']).length}</span></h2>
           {by(['ready']).map((o) => <OrderCard key={o.id} o={o} act={act} isOwner={isOwner} />)}
