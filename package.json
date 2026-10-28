@@ -1,0 +1,28 @@
+{
+  "name": "shawarma",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Сайт шаурмичной: заказ с телефона и админка ларька",
+  "scripts": {
+    "dev": "concurrently -n api,web \"node --watch server/index.js\" \"vite\"",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "nodemailer": "^7.0.5",
+    "pg": "^8.16.3",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.21"
+  }
+}
