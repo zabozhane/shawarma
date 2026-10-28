@@ -5,7 +5,7 @@ import { hashPassword } from './auth.js';
 
 const CATEGORIES = [
   { names: { ru: 'Шаурма', en: 'Shawarma', zh: '沙威玛', ko: '샤와르마', az: 'Şaurma', uz: 'Shaurma', tg: 'Шаурма', tr: 'Şavurma', kk: 'Шаурма' }, counts: true },
-  { names: { ru: 'Закуски', en: 'Sides', zh: '小吃', ko: '사이드', az: 'Qəlyanaltılar', uz: 'Gazaklar', tg: 'Газакҳо', tr: 'Atıştırmalık', kk: 'Тіскебасарлар' }, counts: true },
+  { names: { ru: 'Закуски', en: 'Sides', zh: '小吃', ko: '사이드', az: 'Qəlyanaltılar', uz: 'Gazaklar', tg: 'Газакҳо', tr: 'Atıştırmalık', kk: 'Тіскебасарлар' }, counts: false },
   { names: { ru: 'Напитки', en: 'Drinks', zh: '饮料', ko: '음료', az: 'İçkilər', uz: 'Ichimliklar', tg: 'Нӯшокиҳо', tr: 'İçecekler', kk: 'Сусындар' }, counts: false },
   { names: { ru: 'Соусы', en: 'Sauces', zh: '酱料', ko: '소스', az: 'Souslar', uz: 'Souslar', tg: 'Чошниҳо', tr: 'Soslar', kk: 'Тұздықтар' }, counts: false },
 ];
